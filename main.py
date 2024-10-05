@@ -48,7 +48,7 @@ async def get_1000ms(request):
 
 @span
 def nested_func() -> int:
-    num = random.randint(1, 10)  # noqa: S311
+    num = random.randint(1, 10)
     current_span = trace.get_current_span()
     current_span.set_attribute("num", num)
     current_span.add_event("num rendered")
