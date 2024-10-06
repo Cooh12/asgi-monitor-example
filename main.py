@@ -16,15 +16,16 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 
 logger = logging.getLogger(__name__)
+tracer = trace.get_tracer(__name__)
 
-APP_NAME = "asgi-monitor"
+APP_NAME = "aiohttp-example"
 GRPC_ENDPOINT = "http://jaeger:4317"
 
 
 async def get_500_error(request) -> None:
     raise HTTPInternalServerError(text="Internal Server Error")
 
-tracer = trace.get_tracer(__name__)
+
 
 
 async def hello(request):
