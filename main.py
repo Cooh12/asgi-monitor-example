@@ -22,17 +22,19 @@ APP_NAME = "aiohttp-example"
 GRPC_ENDPOINT = "http://jaeger:4317"
 
 
+async def endpoints(request) -> Response:
+    endpoints_ = ""
+    for route in request.app.router.routes():
+        endpoint = f"http://0.0.0.0:8080{route._resource._path}\n"
+        if endpoint not in endpoints_:
+            endpoints_ += f"<a href='{endpoint}'>{endpoint}</a><br>\n"
+    return Response(text=endpoints_, content_type="text/html")
+
 async def get_500_error(request) -> None:
     raise HTTPInternalServerError(text="Internal Server Error")
 
 
-
-
-async def hello(request):
-    return Response(text="Hello, world")
-
-
-async def get_1000ms(request):
+async def get_1000ms(request) -> Response:
     with tracer.start_as_current_span("sleep 0.1"):
         await asyncio.sleep(0.1)
         logger.error("sick")
@@ -55,7 +57,7 @@ def nested_func() -> int:
     current_span.add_event("num rendered")
     return num
 
-async def get_span(request):
+async def get_span(request) -> Response:
     num = nested_func()
     return json_response({"message": "ok", "status": "success", "num": num})
 
@@ -73,7 +75,7 @@ def setup_routes(app: Application) -> None:
     app.router.add_get("/slow/span", get_span)
     app.router.add_get("/get_404", get_404)
     app.router.add_get("/get_infinity", get_infinity)
-    app.router.add_get("/", hello)
+    app.router.add_get("/", endpoints)
     app.router.add_get("/error", get_500_error)
 
 
